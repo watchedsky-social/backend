@@ -12,8 +12,7 @@ type Zone struct {
 	Name   string   `gorm:"column:name;type:text;not null" json:"name"`
 	Type   string   `gorm:"column:type;type:text;not null" json:"type"`
 	State  *string  `gorm:"column:state;type:text;default:XX" json:"state"`
-	Border Geometry `gorm:"column:border;type:geometry(Geometry,4326);not null" json:"border"`
-	Center Geometry `gorm:"column:center;type:geometry(Point,4326);not null" json:"center"`
+	Border Geometry `gorm:"column:border;type:geometry(Geometry,4326);not null;index:zone_border_geo_idx,priority:1" json:"border"`
 }
 
 // TableName Zone's table name

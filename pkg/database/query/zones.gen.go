@@ -33,7 +33,6 @@ func newZone(db *gorm.DB, opts ...gen.DOOption) zone {
 	_zone.Type = field.NewString(tableName, "type")
 	_zone.State = field.NewString(tableName, "state")
 	_zone.Border = field.NewField(tableName, "border")
-	_zone.Center = field.NewField(tableName, "center")
 
 	_zone.fillFieldMap()
 
@@ -49,7 +48,6 @@ type zone struct {
 	Type   field.String
 	State  field.String
 	Border field.Field
-	Center field.Field
 
 	fieldMap map[string]field.Expr
 }
@@ -71,7 +69,6 @@ func (z *zone) updateTableName(table string) *zone {
 	z.Type = field.NewString(table, "type")
 	z.State = field.NewString(table, "state")
 	z.Border = field.NewField(table, "border")
-	z.Center = field.NewField(table, "center")
 
 	z.fillFieldMap()
 
@@ -96,13 +93,12 @@ func (z *zone) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (z *zone) fillFieldMap() {
-	z.fieldMap = make(map[string]field.Expr, 6)
+	z.fieldMap = make(map[string]field.Expr, 5)
 	z.fieldMap["id"] = z.ID
 	z.fieldMap["name"] = z.Name
 	z.fieldMap["type"] = z.Type
 	z.fieldMap["state"] = z.State
 	z.fieldMap["border"] = z.Border
-	z.fieldMap["center"] = z.Center
 }
 
 func (z zone) clone(db *gorm.DB) zone {

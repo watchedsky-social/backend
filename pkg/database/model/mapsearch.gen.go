@@ -12,7 +12,7 @@ type Mapsearch struct {
 	Name      string   `gorm:"column:name;type:character varying(180);not null" json:"name"`
 	State     string   `gorm:"column:state;type:character varying(20);not null" json:"state"`
 	County    *string  `gorm:"column:county;type:character varying(180)" json:"county"`
-	Centroid  Geometry `gorm:"column:centroid;type:geometry(Point,4326);not null" json:"centroid"`
+	Centroid  Geometry `gorm:"column:centroid;type:geometry(Point,4326);not null;index:mapsearch_centroid_idx,priority:1" json:"centroid"`
 	StateName string   `gorm:"column:state_name;type:character varying(180);not null" json:"state_name"`
 }
 
