@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: watchedsky-frontend-runners
+    runs-on: watchedsky-backend-runners
     permissions:
       contents: read
     steps:
