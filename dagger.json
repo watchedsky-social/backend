@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "sdk": "go",
+  "dependencies": [
+    {
+      "name": "frontend",
+      "source": "github.com/watchedsky-social/frontend@e0907062ccd80280768b32f2045ee8bb85fcaf74"
+    }
+  ],
+  "source": "ci",
+  "engineVersion": "v0.12.0"
+}

@@ -33,7 +33,6 @@ func newMapsearch(db *gorm.DB, opts ...gen.DOOption) mapsearch {
 	_mapsearch.State = field.NewString(tableName, "state")
 	_mapsearch.County = field.NewString(tableName, "county")
 	_mapsearch.Centroid = field.NewField(tableName, "centroid")
-	_mapsearch.StateName = field.NewString(tableName, "state_name")
 
 	_mapsearch.fillFieldMap()
 
@@ -43,13 +42,12 @@ func newMapsearch(db *gorm.DB, opts ...gen.DOOption) mapsearch {
 type mapsearch struct {
 	mapsearchDo mapsearchDo
 
-	ALL       field.Asterisk
-	ID        field.String
-	Name      field.String
-	State     field.String
-	County    field.String
-	Centroid  field.Field
-	StateName field.String
+	ALL      field.Asterisk
+	ID       field.String
+	Name     field.String
+	State    field.String
+	County   field.String
+	Centroid field.Field
 
 	fieldMap map[string]field.Expr
 }
@@ -71,7 +69,6 @@ func (m *mapsearch) updateTableName(table string) *mapsearch {
 	m.State = field.NewString(table, "state")
 	m.County = field.NewString(table, "county")
 	m.Centroid = field.NewField(table, "centroid")
-	m.StateName = field.NewString(table, "state_name")
 
 	m.fillFieldMap()
 
@@ -98,13 +95,12 @@ func (m *mapsearch) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (m *mapsearch) fillFieldMap() {
-	m.fieldMap = make(map[string]field.Expr, 6)
+	m.fieldMap = make(map[string]field.Expr, 5)
 	m.fieldMap["id"] = m.ID
 	m.fieldMap["name"] = m.Name
 	m.fieldMap["state"] = m.State
 	m.fieldMap["county"] = m.County
 	m.fieldMap["centroid"] = m.Centroid
-	m.fieldMap["state_name"] = m.StateName
 }
 
 func (m mapsearch) clone(db *gorm.DB) mapsearch {
@@ -179,17 +175,17 @@ type IMapsearchDo interface {
 	UnderlyingDB() *gorm.DB
 	schema.Tabler
 
-	FindBySubstring(searchStr string) (result []*model.Mapsearch, err error)
+	PrefixSearch(searchText string, mapcenter model.Geometry) (result []*model.Mapsearch, err error)
 }
 
-// SELECT * FROM @@table WHERE fts_index_col \@\@ to_tsquery(@searchStr) ORDER BY ts_rank_cd(fts_index_col, to_tsquery(@searchStr), 32) DESC;
-func (m mapsearchDo) FindBySubstring(searchStr string) (result []*model.Mapsearch, err error) {
+// SELECT * FROM mapsearch WHERE to_tsvector('english', name) \@\@ to_tsquery('english', @searchText || ':*') ORDER BY ST_DistanceSphere(centroid, @mapcenter) LIMIT 10;
+func (m mapsearchDo) PrefixSearch(searchText string, mapcenter model.Geometry) (result []*model.Mapsearch, err error) {
 	var params []interface{}
 
 	var generateSQL strings.Builder
-	params = append(params, searchStr)
-	params = append(params, searchStr)
-	generateSQL.WriteString("SELECT * FROM mapsearch WHERE fts_index_col @@ to_tsquery(?) ORDER BY ts_rank_cd(fts_index_col, to_tsquery(?), 32) DESC; ")
+	params = append(params, searchText)
+	params = append(params, mapcenter)
+	generateSQL.WriteString("SELECT * FROM mapsearch WHERE to_tsvector('english', name) @@ to_tsquery('english', ? || ':*') ORDER BY ST_DistanceSphere(centroid, ?) LIMIT 10; ")
 
 	var executeSQL *gorm.DB
 	executeSQL = m.UnderlyingDB().Raw(generateSQL.String(), params...).Find(&result) // ignore_security_alert

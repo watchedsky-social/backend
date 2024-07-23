@@ -11,18 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type CustomZoneQueries interface {
-	// SELECT id FROM @@table;
-	ListIDs() ([]string, error)
-}
-
-type CustomMapSearchQueries interface {
-	// SELECT * FROM @@table WHERE fts_index_col \@\@ to_tsquery(@searchStr) ORDER BY ts_rank_cd(fts_index_col, to_tsquery(@searchStr), 32) DESC;
-	FindBySubstring(searchStr string) ([]*gen.T, error)
-}
-
 func main() {
-	var args cli.Args
+	var args cli.DBArgs
 	kong.Parse(&args)
 
 	db, _ := gorm.Open(postgres.Open(fmt.Sprintf("host=%s user=%s password=%s dbname=%s TimeZone=UTC", args.Host, args.Username, args.Password, args.DB)))
@@ -61,7 +51,7 @@ func main() {
 	)
 	g.ApplyInterface(
 		func(CustomMapSearchQueries) {},
-		g.GenerateModel("mapsearch", gen.FieldIgnore("fts_index_col")),
+		g.GenerateModel("mapsearch"),
 	)
 	g.Execute()
 }

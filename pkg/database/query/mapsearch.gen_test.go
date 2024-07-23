@@ -145,17 +145,17 @@ func Test_mapsearchQuery(t *testing.T) {
 	}
 }
 
-var MapsearchFindBySubstringTestCase = []TestCase{}
+var MapsearchPrefixSearchTestCase = []TestCase{}
 
-func Test_mapsearch_FindBySubstring(t *testing.T) {
+func Test_mapsearch_PrefixSearch(t *testing.T) {
 	mapsearch := newMapsearch(_gen_test_db)
 	do := mapsearch.WithContext(context.Background()).Debug()
 
-	for i, tt := range MapsearchFindBySubstringTestCase {
-		t.Run("FindBySubstring_"+strconv.Itoa(i), func(t *testing.T) {
-			res1, res2 := do.FindBySubstring(tt.Input.Args[0].(string))
-			assert(t, "FindBySubstring", res1, tt.Expectation.Ret[0])
-			assert(t, "FindBySubstring", res2, tt.Expectation.Ret[1])
+	for i, tt := range MapsearchPrefixSearchTestCase {
+		t.Run("PrefixSearch_"+strconv.Itoa(i), func(t *testing.T) {
+			res1, res2 := do.PrefixSearch(tt.Input.Args[0].(string), tt.Input.Args[1].(model.Geometry))
+			assert(t, "PrefixSearch", res1, tt.Expectation.Ret[0])
+			assert(t, "PrefixSearch", res2, tt.Expectation.Ret[1])
 		})
 	}
 }

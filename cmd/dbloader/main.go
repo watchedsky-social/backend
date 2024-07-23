@@ -1,3 +1,6 @@
+//go:build loaders
+// +build loaders
+
 package main
 
 import (

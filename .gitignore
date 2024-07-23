@@ -1,2 +1,5 @@
 .env
 *.log
+frontend/**
+!frontend/.gitkeep
+/server

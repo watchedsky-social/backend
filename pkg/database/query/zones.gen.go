@@ -173,10 +173,27 @@ type IZoneDo interface {
 	UnderlyingDB() *gorm.DB
 	schema.Tabler
 
+	ShowVisibleZones(southEast model.Geometry, northWest model.Geometry) (result []*model.Zone, err error)
 	ListIDs() (result []string, err error)
 }
 
-// SELECT id FROM @@table;
+// SELECT * FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state);
+func (z zoneDo) ShowVisibleZones(southEast model.Geometry, northWest model.Geometry) (result []*model.Zone, err error) {
+	var params []interface{}
+
+	var generateSQL strings.Builder
+	params = append(params, southEast)
+	params = append(params, northWest)
+	generateSQL.WriteString("SELECT * FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(?, ?), 4326)) ORDER BY concat(name, ' ', type, ' ', state); ")
+
+	var executeSQL *gorm.DB
+	executeSQL = z.UnderlyingDB().Raw(generateSQL.String(), params...).Find(&result) // ignore_security_alert
+	err = executeSQL.Error
+
+	return
+}
+
+// SELECT id FROM zones;
 func (z zoneDo) ListIDs() (result []string, err error) {
 	var generateSQL strings.Builder
 	generateSQL.WriteString("SELECT id FROM zones; ")

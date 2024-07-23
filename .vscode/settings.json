@@ -1,0 +1,6 @@
+{
+    "files.exclude": {
+        "cmd/dbloader/**": true,
+        "pkg/database/loaders/**": true
+    }
+}
