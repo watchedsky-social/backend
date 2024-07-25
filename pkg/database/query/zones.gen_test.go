@@ -145,6 +145,21 @@ func Test_zoneQuery(t *testing.T) {
 	}
 }
 
+var ZoneCountVisibleZonesTestCase = []TestCase{}
+
+func Test_zone_CountVisibleZones(t *testing.T) {
+	zone := newZone(_gen_test_db)
+	do := zone.WithContext(context.Background()).Debug()
+
+	for i, tt := range ZoneCountVisibleZonesTestCase {
+		t.Run("CountVisibleZones_"+strconv.Itoa(i), func(t *testing.T) {
+			res1, res2 := do.CountVisibleZones(tt.Input.Args[0].(model.Geometry), tt.Input.Args[1].(model.Geometry))
+			assert(t, "CountVisibleZones", res1, tt.Expectation.Ret[0])
+			assert(t, "CountVisibleZones", res2, tt.Expectation.Ret[1])
+		})
+	}
+}
+
 var ZoneShowVisibleZonesTestCase = []TestCase{}
 
 func Test_zone_ShowVisibleZones(t *testing.T) {
