@@ -6,10 +6,10 @@ import (
 )
 
 type CustomZoneQueries interface {
-	// SELECT count(*) FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(@southEast, @northWest), 4326));
+	// SELECT count(*) FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326));
 	CountVisibleZones(southEast model.Geometry, northWest model.Geometry) (int64, error)
 
-	// SELECT * FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 10;
+	// SELECT * FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 10;
 	ShowVisibleZones(southEast model.Geometry, northWest model.Geometry) ([]*gen.T, error)
 
 	// SELECT id FROM zones;

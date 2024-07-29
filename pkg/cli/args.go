@@ -16,5 +16,5 @@ type ServerArgs struct {
 	DBArgs
 	Environment string                `short:"e" env:"ENV" enum:"dev,production" default:"dev" help:"The running environment"`
 	Version     kong.VersionFlag      `short:"v" help:"Display this app's version and exit"`
-	Server      *commands.HTTPCommand `cmd:"" default:"withargs" help:"Run the API server and UI"`
+	Run         *commands.HTTPCommand `cmd:"" default:"withargs" help:"Run the API server and UI"`
 }

@@ -1,0 +1,20 @@
+version: "3"
+
+tasks:
+  get-frontend:
+    cmds:
+      - >-
+        dagger -m github.com/watchedsky-social/frontend
+          call get-built-site --registry=registry.lab.verysmart.house
+          --image-version=latest export --path=./frontend
+  dev-server:
+    dotenv:
+      - .env
+    cmds:
+      - go run ./cmd/server
+  rebuild-gorm:
+    dir: ./cmd/gen
+    dotenv:
+      - .env
+    cmds:
+      - go run .

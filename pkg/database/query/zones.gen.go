@@ -178,14 +178,14 @@ type IZoneDo interface {
 	ListIDs() (result []string, err error)
 }
 
-// SELECT count(*) FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(@southEast, @northWest), 4326));
+// SELECT count(*) FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326));
 func (z zoneDo) CountVisibleZones(southEast model.Geometry, northWest model.Geometry) (result int64, err error) {
 	var params []interface{}
 
 	var generateSQL strings.Builder
 	params = append(params, southEast)
 	params = append(params, northWest)
-	generateSQL.WriteString("SELECT count(*) FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(?, ?), 4326)); ")
+	generateSQL.WriteString("SELECT count(*) FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(?, ?), 4326)); ")
 
 	var executeSQL *gorm.DB
 	executeSQL = z.UnderlyingDB().Raw(generateSQL.String(), params...).Take(&result) // ignore_security_alert
@@ -194,14 +194,14 @@ func (z zoneDo) CountVisibleZones(southEast model.Geometry, northWest model.Geom
 	return
 }
 
-// SELECT * FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 10;
+// SELECT * FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 10;
 func (z zoneDo) ShowVisibleZones(southEast model.Geometry, northWest model.Geometry) (result []*model.Zone, err error) {
 	var params []interface{}
 
 	var generateSQL strings.Builder
 	params = append(params, southEast)
 	params = append(params, northWest)
-	generateSQL.WriteString("SELECT * FROM zones WHERE ST_Intersects(geometry, ST_SRID(ST_MakeBox2D(?, ?), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 10; ")
+	generateSQL.WriteString("SELECT * FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(?, ?), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 10; ")
 
 	var executeSQL *gorm.DB
 	executeSQL = z.UnderlyingDB().Raw(generateSQL.String(), params...).Find(&result) // ignore_security_alert

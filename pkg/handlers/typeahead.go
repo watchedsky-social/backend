@@ -9,12 +9,12 @@ import (
 
 func Typeahead(ctx *fiber.Ctx) error {
 	prefix := ctx.Query("prefix")
-	lon := ctx.QueryFloat("lon")
+	lng := ctx.QueryFloat("lng")
 	lat := ctx.QueryFloat("lat")
-	zones, err := query.Mapsearch.WithContext(ctx.UserContext()).PrefixSearch(prefix, model.NewGenericGeometry(orb.Point{lon, lat}))
+	searchResults, err := query.Mapsearch.WithContext(ctx.UserContext()).PrefixSearch(prefix, model.NewGenericGeometry(orb.Point{lng, lat}))
 	if err != nil {
 		return err
 	}
 
-	return ctx.JSON(zones)
+	return ctx.JSON(searchResults)
 }
