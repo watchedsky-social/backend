@@ -8,6 +8,7 @@ import (
 
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/encoding/ewkb"
+	"github.com/paulmach/orb/geojson"
 )
 
 type Point orb.Point
@@ -59,15 +60,15 @@ func (g Geometry) Value() (driver.Value, error) {
 }
 
 func (g *Geometry) UnmarshalJSON(data []byte) error {
-	var geo orb.Geometry
+	var geo geojson.Geometry
 	if err := json.Unmarshal(data, &geo); err != nil {
 		return err
 	}
 
-	*g = Geometry{g: geo}
+	*g = Geometry{g: geo.Geometry()}
 	return nil
 }
 
 func (g Geometry) MarshalJSON() ([]byte, error) {
-	return json.Marshal(g.g)
+	return json.Marshal(geojson.NewGeometry(g.g))
 }
