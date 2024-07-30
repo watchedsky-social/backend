@@ -15,6 +15,6 @@ tasks:
   rebuild-gorm:
     dir: ./cmd/gen
     dotenv:
-      - .env
+      - ../../.env
     cmds:
       - go run .

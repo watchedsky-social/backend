@@ -9,7 +9,7 @@ type CustomZoneQueries interface {
 	// SELECT count(*) FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326));
 	CountVisibleZones(southEast model.Geometry, northWest model.Geometry) (int64, error)
 
-	// SELECT * FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 10;
+	// SELECT * FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 20;
 	ShowVisibleZones(southEast model.Geometry, northWest model.Geometry) ([]*gen.T, error)
 
 	// SELECT id FROM zones;
@@ -17,6 +17,11 @@ type CustomZoneQueries interface {
 }
 
 type CustomMapSearchQueries interface {
-	// SELECT * FROM mapsearch WHERE to_tsvector('english', name) \@\@ to_tsquery('english', @searchText || ':*') ORDER BY ST_DistanceSphere(centroid, @mapcenter) LIMIT 10;
-	PrefixSearch(searchText string, mapcenter model.Geometry) ([]*gen.T, error)
+	/* WITH searchResults AS (
+	       SELECT * FROM mapsearch
+	           WHERE display_name ILIKE @searchText || '%' OR id LIKE @searchText || '%'
+	       )
+	   SELECT DISTINCT ON (display_name) id, name, state, county, centroid
+	       FROM searchResults ORDER by display_name;  */
+	PrefixSearch(searchText string) ([]*gen.T, error)
 }

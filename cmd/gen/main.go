@@ -51,7 +51,7 @@ func main() {
 	)
 	g.ApplyInterface(
 		func(CustomMapSearchQueries) {},
-		g.GenerateModel("mapsearch"),
+		g.GenerateModel("mapsearch", gen.FieldIgnore("display_name")),
 	)
 	g.Execute()
 }

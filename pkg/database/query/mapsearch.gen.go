@@ -175,17 +175,23 @@ type IMapsearchDo interface {
 	UnderlyingDB() *gorm.DB
 	schema.Tabler
 
-	PrefixSearch(searchText string, mapcenter model.Geometry) (result []*model.Mapsearch, err error)
+	PrefixSearch(searchText string) (result []*model.Mapsearch, err error)
 }
 
-// SELECT * FROM mapsearch WHERE to_tsvector('english', name) \@\@ to_tsquery('english', @searchText || ':*') ORDER BY ST_DistanceSphere(centroid, @mapcenter) LIMIT 10;
-func (m mapsearchDo) PrefixSearch(searchText string, mapcenter model.Geometry) (result []*model.Mapsearch, err error) {
+// WITH searchResults AS (
+//
+//	    SELECT * FROM mapsearch
+//	        WHERE display_name ILIKE @searchText || '%' OR id LIKE @searchText || '%'
+//	    )
+//	SELECT DISTINCT ON (display_name) id, name, state, county, centroid
+//	    FROM searchResults ORDER by display_name;
+func (m mapsearchDo) PrefixSearch(searchText string) (result []*model.Mapsearch, err error) {
 	var params []interface{}
 
 	var generateSQL strings.Builder
 	params = append(params, searchText)
-	params = append(params, mapcenter)
-	generateSQL.WriteString("SELECT * FROM mapsearch WHERE to_tsvector('english', name) @@ to_tsquery('english', ? || ':*') ORDER BY ST_DistanceSphere(centroid, ?) LIMIT 10; ")
+	params = append(params, searchText)
+	generateSQL.WriteString("WITH searchResults AS ( SELECT * FROM mapsearch WHERE display_name ILIKE ? || '%' OR id LIKE ? || '%' ) SELECT DISTINCT ON (display_name) id, name, state, county, centroid FROM searchResults ORDER by display_name; ")
 
 	var executeSQL *gorm.DB
 	executeSQL = m.UnderlyingDB().Raw(generateSQL.String(), params...).Find(&result) // ignore_security_alert

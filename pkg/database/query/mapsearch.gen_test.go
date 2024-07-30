@@ -153,7 +153,7 @@ func Test_mapsearch_PrefixSearch(t *testing.T) {
 
 	for i, tt := range MapsearchPrefixSearchTestCase {
 		t.Run("PrefixSearch_"+strconv.Itoa(i), func(t *testing.T) {
-			res1, res2 := do.PrefixSearch(tt.Input.Args[0].(string), tt.Input.Args[1].(model.Geometry))
+			res1, res2 := do.PrefixSearch(tt.Input.Args[0].(string))
 			assert(t, "PrefixSearch", res1, tt.Expectation.Ret[0])
 			assert(t, "PrefixSearch", res2, tt.Expectation.Ret[1])
 		})

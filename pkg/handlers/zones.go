@@ -11,6 +11,8 @@ import (
 	"github.com/watchedsky-social/backend/pkg/database/query"
 )
 
+const maxZoneReturn = 20
+
 func VisibleZones(ctx *fiber.Ctx) error {
 	sePoint := ctx.Query("boxse")
 	nwPoint := ctx.Query("boxnw")
@@ -40,6 +42,20 @@ func VisibleZones(ctx *fiber.Ctx) error {
 
 	se := model.NewGenericGeometry(orb.Point{seLon, seLat})
 	nw := model.NewGenericGeometry(orb.Point{nwLon, nwLat})
+
+	dao := query.Zone.WithContext(ctx.UserContext())
+	zoneCount, err := dao.CountVisibleZones(se, nw)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(map[string]string{"error": err.Error()})
+	}
+
+	if zoneCount == 0 {
+		return ctx.SendStatus(http.StatusNoContent)
+	}
+
+	if zoneCount > maxZoneReturn {
+		return ctx.SendStatus(http.StatusUnprocessableEntity)
+	}
 
 	zones, err := query.Zone.WithContext(ctx.UserContext()).ShowVisibleZones(se, nw)
 	if err != nil {
