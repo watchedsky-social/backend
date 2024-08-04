@@ -194,14 +194,14 @@ func (z zoneDo) CountVisibleZones(southEast model.Geometry, northWest model.Geom
 	return
 }
 
-// SELECT * FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 20;
+// SELECT * FROM zones WHERE type='county' AND ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 20;
 func (z zoneDo) ShowVisibleZones(southEast model.Geometry, northWest model.Geometry) (result []*model.Zone, err error) {
 	var params []interface{}
 
 	var generateSQL strings.Builder
 	params = append(params, southEast)
 	params = append(params, northWest)
-	generateSQL.WriteString("SELECT * FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(?, ?), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 20; ")
+	generateSQL.WriteString("SELECT * FROM zones WHERE type='county' AND ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(?, ?), 4326)) ORDER BY concat(name, ' ', type, ' ', state) LIMIT 20; ")
 
 	var executeSQL *gorm.DB
 	executeSQL = z.UnderlyingDB().Raw(generateSQL.String(), params...).Find(&result) // ignore_security_alert

@@ -4,8 +4,8 @@ tasks:
   get-frontend:
     cmds:
       - >-
-        dagger -m github.com/watchedsky-social/frontend
-          call get-built-site --registry=registry.lab.verysmart.house
+        dagger call -m github.com/watchedsky-social/frontend \
+          get-built-site --registry=registry.lab.verysmart.house \
           --image-version=latest export --path=./frontend
   dev-server:
     dotenv:
