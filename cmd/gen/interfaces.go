@@ -14,6 +14,9 @@ type CustomZoneQueries interface {
 
 	// SELECT id FROM zones;
 	ListIDs() ([]string, error)
+
+	// SELECT z2.id FROM zones z1 INNER JOIN zones z2 ON z1.border = z2.border WHERE z1.id IN (@zoneList);
+	FindCongruentZones(zoneList []string) ([]string, error)
 }
 
 type CustomMapSearchQueries interface {

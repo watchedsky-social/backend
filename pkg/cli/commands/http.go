@@ -57,6 +57,7 @@ func (h *HTTPCommand) Run(ctx context.Context, production bool) error {
 	api := app.Group("/api/v1")
 	api.Get("/typeahead", handlers.Typeahead)
 	api.Get("/zones/visible", handlers.VisibleZones)
+	api.Get("/zones/watchid", handlers.GetWatchID)
 
 	if production {
 		app.Get("/*", filesystem.New(filesystem.Config{

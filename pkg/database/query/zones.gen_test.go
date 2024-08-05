@@ -189,3 +189,18 @@ func Test_zone_ListIDs(t *testing.T) {
 		})
 	}
 }
+
+var ZoneFindCongruentZonesTestCase = []TestCase{}
+
+func Test_zone_FindCongruentZones(t *testing.T) {
+	zone := newZone(_gen_test_db)
+	do := zone.WithContext(context.Background()).Debug()
+
+	for i, tt := range ZoneFindCongruentZonesTestCase {
+		t.Run("FindCongruentZones_"+strconv.Itoa(i), func(t *testing.T) {
+			res1, res2 := do.FindCongruentZones(tt.Input.Args[0].([]string))
+			assert(t, "FindCongruentZones", res1, tt.Expectation.Ret[0])
+			assert(t, "FindCongruentZones", res2, tt.Expectation.Ret[1])
+		})
+	}
+}

@@ -18,12 +18,14 @@ import (
 var (
 	Q         = new(Query)
 	Mapsearch *mapsearch
+	SavedArea *savedArea
 	Zone      *zone
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Mapsearch = &Q.Mapsearch
+	SavedArea = &Q.SavedArea
 	Zone = &Q.Zone
 }
 
@@ -31,6 +33,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:        db,
 		Mapsearch: newMapsearch(db, opts...),
+		SavedArea: newSavedArea(db, opts...),
 		Zone:      newZone(db, opts...),
 	}
 }
@@ -39,6 +42,7 @@ type Query struct {
 	db *gorm.DB
 
 	Mapsearch mapsearch
+	SavedArea savedArea
 	Zone      zone
 }
 
@@ -48,6 +52,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
 		Mapsearch: q.Mapsearch.clone(db),
+		SavedArea: q.SavedArea.clone(db),
 		Zone:      q.Zone.clone(db),
 	}
 }
@@ -64,18 +69,21 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:        db,
 		Mapsearch: q.Mapsearch.replaceDB(db),
+		SavedArea: q.SavedArea.replaceDB(db),
 		Zone:      q.Zone.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
 	Mapsearch IMapsearchDo
+	SavedArea ISavedAreaDo
 	Zone      IZoneDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		Mapsearch: q.Mapsearch.WithContext(ctx),
+		SavedArea: q.SavedArea.WithContext(ctx),
 		Zone:      q.Zone.WithContext(ctx),
 	}
 }

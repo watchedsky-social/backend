@@ -78,6 +78,7 @@ func Test_WithContext(t *testing.T) {
 
 	for _, ctx := range []context.Context{
 		qCtx.Mapsearch.UnderlyingDB().Statement.Context,
+		qCtx.SavedArea.UnderlyingDB().Statement.Context,
 		qCtx.Zone.UnderlyingDB().Statement.Context,
 	} {
 		if v := ctx.Value(key); v != value {

@@ -176,6 +176,7 @@ type IZoneDo interface {
 	CountVisibleZones(southEast model.Geometry, northWest model.Geometry) (result int64, err error)
 	ShowVisibleZones(southEast model.Geometry, northWest model.Geometry) (result []*model.Zone, err error)
 	ListIDs() (result []string, err error)
+	FindCongruentZones(zoneList []string) (result []string, err error)
 }
 
 // SELECT count(*) FROM zones WHERE ST_Intersects(border, ST_SetSRID(ST_MakeBox2D(@southEast, @northWest), 4326));
@@ -217,6 +218,21 @@ func (z zoneDo) ListIDs() (result []string, err error) {
 
 	var executeSQL *gorm.DB
 	executeSQL = z.UnderlyingDB().Raw(generateSQL.String()).Find(&result) // ignore_security_alert
+	err = executeSQL.Error
+
+	return
+}
+
+// SELECT z2.id FROM zones z1 INNER JOIN zones z2 ON z1.border = z2.border WHERE z1.id IN (@zoneList);
+func (z zoneDo) FindCongruentZones(zoneList []string) (result []string, err error) {
+	var params []interface{}
+
+	var generateSQL strings.Builder
+	params = append(params, zoneList)
+	generateSQL.WriteString("SELECT z2.id FROM zones z1 INNER JOIN zones z2 ON z1.border = z2.border WHERE z1.id IN (?); ")
+
+	var executeSQL *gorm.DB
+	executeSQL = z.UnderlyingDB().Raw(generateSQL.String(), params...).Find(&result) // ignore_security_alert
 	err = executeSQL.Error
 
 	return
